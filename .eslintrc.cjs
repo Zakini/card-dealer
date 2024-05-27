@@ -24,5 +24,6 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    '@stylistic/jsx-one-expression-per-line': 'off',
   },
 }
