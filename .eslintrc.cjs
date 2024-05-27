@@ -30,6 +30,6 @@ module.exports = {
       { allowConstantExport: true },
     ],
     '@stylistic/jsx-one-expression-per-line': 'off',
-    '@stylistic/brace-style': ['error', '1tbs', { "allowSingleLine": true }],
+    '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: true }],
   },
 }
