@@ -1,26 +1,23 @@
-import { cardMap } from '../utils/cards'
 import cardBack from '../assets/cards/default/back.svg'
+import { useState } from 'react'
 
 interface Props {
-  cardName: string | null
   faceUp: boolean
 
   className?: string
   onClick?: () => void
 }
 
-export default function Card({ cardName, faceUp, className = '', onClick }: Props) {
-  let card
+const deck = Object.values(import.meta.glob<string>(
+  '../assets/cards/default/faces/*.svg',
+  { eager: true, import: 'default' },
+))
 
-  if (faceUp) {
-    // TODO show unknown face if null?
-    if (cardName === null) return
-    card = cardMap[cardName]
-  } else {
-    card = cardBack
-  }
+export default function Card({ faceUp, className = '', onClick }: Props) {
+  // useState so that the chosen card doesn't change on render
+  const [card] = useState(deck[Math.floor(Math.random() * deck.length)])
 
   return (
-    <img src={card} className={`${className} aspect-auto`} onClick={onClick} />
+    <img src={faceUp ? card : cardBack} className={`${className} aspect-auto`} onClick={onClick} />
   )
 }

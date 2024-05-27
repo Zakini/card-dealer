@@ -1,23 +1,14 @@
-import { useEffect, useState } from 'react'
-import { cardMap } from './utils/cards'
+import { useState } from 'react'
 import Card from './components/Card'
 import { motion, AnimatePresence } from 'framer-motion'
-
-const possibleCardNames = Object.keys(cardMap)
 
 function App() {
   // The card has started being dealt, but is still animating in
   const [cardDealing, setCardDealing] = useState(false)
   // The card has been fully dealt
   const [cardDealt, setCardDealt] = useState(false)
-  // Which card has been chosen
-  const [card, setCard] = useState<string | null>(null)
   // If the card is face up or down
   const [faceUp, setFaceUp] = useState(false)
-
-  useEffect(() => {
-    setCard(possibleCardNames[Math.floor(Math.random() * possibleCardNames.length)])
-  }, [])
 
   return (
     // z-0 starts a new stacking context here (I think?)
@@ -36,7 +27,6 @@ function App() {
               }}
             >
               <Card
-                cardName={card}
                 faceUp={faceUp}
                 className="h-1/2"
                 onClick={() => {
