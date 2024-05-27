@@ -31,5 +31,8 @@ module.exports = {
     ],
     '@stylistic/jsx-one-expression-per-line': 'off',
     '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: true }],
+    // Good premise, but this rule behaves a bit weirdly
+    '@stylistic/indent-binary-ops': 'off',
+    'max-len': ['warn', 100],
   },
 }
