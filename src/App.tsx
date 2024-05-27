@@ -7,13 +7,14 @@ const possibleCardNames = Object.keys(cardMap)
 
 function App() {
   const [card, setCard] = useState<string | null>(null)
+  const [faceUp, setFaceUp] = useState(false)
 
   useEffect(() => {
     setCard(possibleCardNames[Math.floor(Math.random() * possibleCardNames.length)])
   }, [])
 
   return (
-    <Card cardName={card} />
+    <Card cardName={card} faceUp={faceUp} onClick={() => { setFaceUp(s => !s) }} />
   )
 }
 
