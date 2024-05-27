@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import './App.css'
 import { cardMap } from './utils/cards'
 import Card from './components/Card'
 
