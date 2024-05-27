@@ -1,22 +1,19 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import { cardMap } from './utils/cards'
+import Card from './components/Card'
 
-const cardImports = Object.values(
-  import.meta.glob<string>(
-    './assets/cards/default/*.svg',
-    { eager: true, import: 'default' },
-  ),
-)
+const possibleCardNames = Object.keys(cardMap)
 
 function App() {
-  const [card, setCard] = useState<string | undefined>(undefined)
+  const [card, setCard] = useState<string | null>(null)
 
   useEffect(() => {
-    setCard(cardImports[Math.floor(Math.random() * cardImports.length)])
+    setCard(possibleCardNames[Math.floor(Math.random() * possibleCardNames.length)])
   }, [])
 
   return (
-    <img src={card} />
+    <Card cardName={card} />
   )
 }
 
