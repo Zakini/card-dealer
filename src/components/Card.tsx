@@ -1,13 +1,15 @@
 import { cardMap } from '../utils/cards'
 import cardBack from '../assets/cards/default/back.svg'
 
-type Props = React.ImgHTMLAttributes<HTMLImageElement> & {
+interface Props {
   cardName: string | null
   faceUp: boolean
+
+  className?: string
   onClick?: () => void
 }
 
-export default function Card({ cardName, faceUp, onClick }: Props) {
+export default function Card({ cardName, faceUp, className = '', onClick }: Props) {
   let card
 
   if (faceUp) {
@@ -19,6 +21,6 @@ export default function Card({ cardName, faceUp, onClick }: Props) {
   }
 
   return (
-    <img src={card} onClick={onClick} />
+    <img src={card} className={`${className} w-full`} onClick={onClick} />
   )
 }

@@ -13,7 +13,7 @@ function App() {
   }, [])
 
   return (
-    <Card cardName={card} faceUp={faceUp} onClick={() => { setFaceUp(s => !s) }} />
+    <Card cardName={card} faceUp={faceUp} className="w-40" onClick={() => { setFaceUp(s => !s) }} />
   )
 }
 
