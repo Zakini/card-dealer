@@ -7,8 +7,6 @@ function App() {
   const [cardDealing, setCardDealing] = useState(false)
   // The card has been fully dealt
   const [cardDealt, setCardDealt] = useState(false)
-  // If the card is face up or down
-  const [faceUp, setFaceUp] = useState(false)
 
   return (
     // z-0 starts a new stacking context here (I think?)
@@ -26,13 +24,7 @@ function App() {
                 setCardDealt(true)
               }}
             >
-              <Card
-                faceUp={faceUp}
-                className="h-1/2"
-                onClick={() => {
-                  if (cardDealt) setFaceUp(true)
-                }}
-              />
+              <Card className="h-1/2" />
             </motion.div>
           )}
         </AnimatePresence>

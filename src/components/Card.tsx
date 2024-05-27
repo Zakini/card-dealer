@@ -2,10 +2,7 @@ import cardBack from '../assets/cards/default/back.svg'
 import { useState } from 'react'
 
 interface Props {
-  faceUp: boolean
-
   className?: string
-  onClick?: () => void
 }
 
 const deck = Object.values(import.meta.glob<string>(
@@ -13,11 +10,20 @@ const deck = Object.values(import.meta.glob<string>(
   { eager: true, import: 'default' },
 ))
 
-export default function Card({ faceUp, className = '', onClick }: Props) {
+export default function Card({ className = '' }: Props) {
   // useState so that the chosen card doesn't change on render
   const [card] = useState(deck[Math.floor(Math.random() * deck.length)])
+  const [faceUp, setFaceUp] = useState(false)
+  // TODO set this to true when card deal animation ends
+  const cardDealt = true
 
   return (
-    <img src={faceUp ? card : cardBack} className={`${className} aspect-auto`} onClick={onClick} />
+    <img
+      className={`${className} aspect-auto`}
+      src={faceUp ? card : cardBack}
+      onClick={() => {
+        if (cardDealt) setFaceUp(true)
+      }}
+    />
   )
 }
