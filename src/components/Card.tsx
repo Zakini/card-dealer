@@ -21,6 +21,6 @@ export default function Card({ cardName, faceUp, className = '', onClick }: Prop
   }
 
   return (
-    <img src={card} className={`${className} w-full`} onClick={onClick} />
+    <img src={card} className={`${className} aspect-auto`} onClick={onClick} />
   )
 }

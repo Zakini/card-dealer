@@ -13,7 +13,9 @@ function App() {
   }, [])
 
   return (
-    <Card cardName={card} faceUp={faceUp} className="w-40" onClick={() => { setFaceUp(s => !s) }} />
+    <div className="h-screen flex items-center justify-center">
+      <Card cardName={card} faceUp={faceUp} className="h-1/2" onClick={() => { setFaceUp(s => !s) }} />
+    </div>
   )
 }
 
