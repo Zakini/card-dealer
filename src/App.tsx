@@ -37,23 +37,24 @@ function App() {
         className="h-screen overflow-hidden z-10 flex items-center justify-center"
         onClick={() => { setCardDealt(true) }}
       >
-        {cardDealt && (
-          <Card
-            className="h-1/2"
-            // NOTE we use 100vh since the container fills the screen, and 50% since that's the
-            // height of the card. Update this if either of those changes!
-            initialY="calc(100vh - 50%)"
-            onFlip={({ faceUp }) => {
-              if (faceUp) setCardRevealed(true)
-            }}
-          />
-        )}
+        <Card
+          deal={cardDealt}
+          className="h-1/2"
+          // NOTE we use 100vh since the container fills the screen, and 50% since that's the
+          // height of the card. Update this if either of those changes!
+          initialY="calc(100vh - 50%)"
+          onFlip={({ faceUp }) => {
+            if (faceUp) setCardRevealed(true)
+          }}
+        />
       </div>
 
       <AnimatePresence>
         {!cardDealt && (
           <motion.div
             className="absolute inset-0 -z-10 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 1 } }}
             exit={{ opacity: 0, transition: { duration: 1 } }}
           >
             <span className="text-gray-900 text-9xl uppercase font-bold select-none">
