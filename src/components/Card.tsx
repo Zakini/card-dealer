@@ -44,10 +44,6 @@ export default function Card({ className: inputClassName = '', initialY, onFlip 
 
   return (
     <AnimatePresence>
-      {/*
-        NOTE we use 100vh since the container fills the screen, and 50% since that's the
-        height of the card. Update this if either of those changes!
-      */}
       {!flipping && !faceUp && (
         <motion.div
           initial={{ y: initialY }}

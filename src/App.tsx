@@ -40,6 +40,8 @@ function App() {
         {cardDealt && (
           <Card
             className="h-1/2"
+            // NOTE we use 100vh since the container fills the screen, and 50% since that's the
+            // height of the card. Update this if either of those changes!
             initialY="calc(100vh - 50%)"
             onFlip={({ faceUp }) => {
               if (faceUp) setCardRevealed(true)
