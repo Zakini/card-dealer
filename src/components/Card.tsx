@@ -71,15 +71,8 @@ export default function Card({ className: inputClassName = '', initialY, onFlip 
         <motion.div
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1, transition: { ease: 'easeIn' } }}
-          onAnimationComplete={() => { setCardDealt(true) }}
         >
-          <img
-            className={className}
-            src={card}
-            onClick={() => {
-              if (cardDealt) setFaceUp(true)
-            }}
-          />
+          <img className={className} src={card} />
         </motion.div>
       )}
     </AnimatePresence>
