@@ -1,10 +1,12 @@
 import { motion, AnimatePresence, CustomValueType } from 'framer-motion'
 import cardBack from '../assets/cards/default/back.svg'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface Props {
   className?: string
   initialY: string | number | CustomValueType
+
+  onFlip: (info: { faceUp: boolean }) => void
 }
 
 const deck = Object.values(import.meta.glob<string>(
@@ -12,14 +14,33 @@ const deck = Object.values(import.meta.glob<string>(
   { eager: true, import: 'default' },
 ))
 
-export default function Card({ className: inputClassName = '', initialY }: Props) {
+const usePrevious = <T,>(value: T, initial: T | null = null) => {
+  const [current, setCurrent] = useState<T>(value)
+  const [previous, setPrevious] = useState<T | null>(initial)
+
+  if (value !== current) {
+    setPrevious(current)
+    setCurrent(value)
+  }
+
+  return previous
+}
+
+export default function Card({ className: inputClassName = '', initialY, onFlip }: Props) {
   const className = `${inputClassName} aspect-auto`
 
   // useState so that the chosen card doesn't change on render
   const [card] = useState(deck[Math.floor(Math.random() * deck.length)])
   const [flipping, setFlipping] = useState(false)
   const [faceUp, setFaceUp] = useState(false)
+  const wasFaceUp = usePrevious(faceUp, false)
   const [cardDealt, setCardDealt] = useState(false)
+
+  useEffect(() => {
+    if (faceUp === (wasFaceUp)) return
+
+    onFlip({ faceUp })
+  }, [faceUp, wasFaceUp, onFlip])
 
   return (
     <AnimatePresence>
