@@ -34,5 +34,6 @@ module.exports = {
     // Good premise, but this rule behaves a bit weirdly
     '@stylistic/indent-binary-ops': 'off',
     'max-len': ['warn', 100],
+    'no-console': ['warn', { allow: ['info', 'warn', 'error'] }],
   },
 }
