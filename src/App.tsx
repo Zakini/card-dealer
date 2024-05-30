@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react'
 import Card from './components/Card'
 import { motion, AnimatePresence } from 'framer-motion'
-import resolveConfig from 'tailwindcss/resolveConfig'
-import type { Config as TailwindConfig } from 'tailwindcss/types/config'
-import tailwindConfig from '../tailwind.config.js'
-
-const tailwind = resolveConfig<TailwindConfig>(tailwindConfig)
+import { config as tailwind } from './utils/tailwind'
 
 function App() {
   const [cardDealt, setCardDealt] = useState(false)
