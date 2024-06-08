@@ -3,10 +3,31 @@ import Card from './components/Card'
 import { motion, AnimatePresence } from 'framer-motion'
 import { config as tailwind } from './utils/tailwind'
 
+type WsEventListener<K extends keyof WebSocketEventMap> =
+  (this: WebSocket, ev: WebSocketEventMap[K]) => unknown
+
+const port = 4245
+const socket = new WebSocket(`ws://localhost:${port}`)
+// TODO check for broken connections
+// See: https://www.npmjs.com/package/ws#how-to-detect-and-close-broken-connections
+
 function App() {
   const [cardDealt, setCardDealt] = useState(false)
   const [cardRevealed, setCardRevealed] = useState(false)
   const [allowRedeal, setAllowRedeal] = useState(false)
+
+  // Handle stream deck input
+  useEffect(() => {
+    const dealListener: WsEventListener<'message'> = (message) => {
+      if (message.data !== 'deal') return
+      setCardDealt(true)
+    }
+    socket.addEventListener('message', dealListener)
+
+    return () => {
+      socket.removeEventListener('message', dealListener)
+    }
+  }, [])
 
   useEffect(() => {
     if (!cardRevealed) return
