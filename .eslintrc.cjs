@@ -35,5 +35,7 @@ module.exports = {
     '@stylistic/indent-binary-ops': 'off',
     'max-len': ['warn', 100],
     'no-console': ['warn', { allow: ['info', 'warn', 'error'] }],
+    // Why would you not allow numbers??
+    '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
   },
 }
