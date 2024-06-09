@@ -11,6 +11,8 @@ function App() {
   const [allowRedeal, setAllowRedeal] = useState(false)
 
   // Handle stream deck input
+  // TODO this effect runs twice (cos react) and doesn't properly clean up the socket
+  // Swap to react-use-websocket (or similar)?
   useEffect(() => {
     const effect = async () => {
       try {
