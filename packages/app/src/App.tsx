@@ -3,6 +3,7 @@ import Card from './components/Card'
 import { motion, AnimatePresence } from 'framer-motion'
 import { config as tailwind } from './utils/tailwind'
 import connectToWebsocket, { WsEventListener } from './utils/websocket'
+import { cardMessage } from '@card-dealer/utils'
 
 function App() {
   const [socket, setSocket] = useState<WebSocket | null>(null)
@@ -33,7 +34,7 @@ function App() {
     if (!socket) return
 
     const dealListener: WsEventListener<'message'> = (message) => {
-      if (message.data !== 'deal-card-next') {
+      if (message.data !== cardMessage) {
         console.warn(`Unexpected websocket message: ${message.data}`)
         return
       }

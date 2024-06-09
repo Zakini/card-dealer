@@ -1,6 +1,6 @@
 import { WebSocket, WebSocketServer } from 'ws'
 import logger from './logger'
-import { pingDelay } from '@card-dealer/utils'
+import { findOpenPort, pingDelay } from '@card-dealer/utils'
 
 interface WebSocketClient extends WebSocket {
   isAlive?: boolean
@@ -26,27 +26,6 @@ const waitForServerStart = async (server: WebSocketServer) =>
     server.once('listening', onSuccess)
     server.once('error', onError)
   })
-
-// TODO share this across packages
-interface FindOpenPortOptions<T> {
-  attemptPort: (port: number) => T | Promise<T> | never
-  isUnavailablePortError: (e: unknown) => boolean
-}
-const portRangeStart = 6660
-const portRangeLength = 10
-const findOpenPort = async <T>({ attemptPort, isUnavailablePortError }: FindOpenPortOptions<T>) => {
-  for (let port = portRangeStart; port < portRangeStart + portRangeLength; port++) {
-    try {
-      return await attemptPort(port)
-    } catch (e) {
-      if (isUnavailablePortError(e)) continue
-      throw e
-    }
-  }
-
-  const portRangeString = `${portRangeStart} and ${portRangeStart + portRangeLength - 1}`
-  throw new Error(`Failed to find open port between ${portRangeString}`)
-}
 
 const detectBrokenConnections = (server: WebSocketServer): void => {
   server.on('connection', (client: WebSocketClient) => {
