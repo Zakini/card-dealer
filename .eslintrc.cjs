@@ -1,4 +1,3 @@
-/* eslint-env node */
 /** @type import('eslint').Linter.Config */
 module.exports = {
   root: true,
@@ -38,4 +37,18 @@ module.exports = {
     // Why would you not allow numbers??
     '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
   },
+  overrides: [
+    {
+      files: [
+        '.eslintrc.cjs',
+        '*.config.ts',
+        '*.config.js',
+        '*.config.mjs',
+        'packages/*/*.config.ts',
+        'packages/*/*.config.js',
+        'packages/*/*.config.mjs',
+      ],
+      env: { node: true },
+    },
+  ],
 }

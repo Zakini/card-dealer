@@ -11,7 +11,9 @@
     ".eslintrc.cjs",
     "*.config.ts",
     "*.config.js",
+    "*.config.mjs",
     "packages/*/*.config.ts",
-    "packages/*/*.config.js"
+    "packages/*/*.config.js",
+    "packages/*/*.config.mjs"
   ]
 }

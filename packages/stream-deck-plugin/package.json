@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "rollup -c -w --watch.onEnd=\"streamdeck restart com.zakini.card-dealer\"",
 		"build": "rollup -c",
+    "lint": "eslint . --ext .ts,.tsx,.config.js,.cjs,.mjs --report-unused-disable-directives --max-warnings 0"
 	},
 	"dependencies": {
 		"@elgato/streamdeck": "^0.3.0"
