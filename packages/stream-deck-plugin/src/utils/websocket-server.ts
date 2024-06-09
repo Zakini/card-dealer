@@ -1,18 +1,55 @@
-import streamDeck from '@elgato/streamdeck'
 import { WebSocket, WebSocketServer } from 'ws'
-
-type Logger = typeof streamDeck.logger
-interface Options {
-  logger: Logger
-}
+import logger from './logger'
 
 interface WebSocketClient extends WebSocket {
   isAlive?: boolean
 }
 
+const isErrnoException = (v: unknown): v is NodeJS.ErrnoException => typeof v === 'object'
+  && v !== null
+  && 'code' in v
+  && typeof v.code === 'string'
+
+const waitForServerStart = async (server: WebSocketServer) =>
+  new Promise<void>((resolve, reject) => {
+    const onSuccess = () => {
+      server.off('error', onError)
+      logger.debug(`Websocket server listening on port ${server.options.port}`)
+      resolve()
+    }
+    const onError = (e: Error) => {
+      server.off('connection', onSuccess)
+      reject(e)
+    }
+
+    server.once('listening', onSuccess)
+    server.once('error', onError)
+  })
+
+// TODO share this across packages
+interface FindOpenPortOptions<T> {
+  attemptPort: (port: number) => T | Promise<T> | never
+  isUnavailablePortError: (e: unknown) => boolean
+}
+const portRangeStart = 6660
+const portRangeLength = 10
+const findOpenPort = async <T>({ attemptPort, isUnavailablePortError }: FindOpenPortOptions<T>) => {
+  for (let port = portRangeStart; port < portRangeStart + portRangeLength; port++) {
+    try {
+      return await attemptPort(port)
+    } catch (e) {
+      if (isUnavailablePortError(e)) continue
+      throw e
+    }
+  }
+
+  const portRangeString = `${portRangeStart} and ${portRangeStart + portRangeLength - 1}`
+  throw new Error(`Failed to find open port between ${portRangeString}`)
+}
+
 // TODO share this across packages
 const pingDelay = 30_000
-const detectBrokenConnections = (server: WebSocketServer, logger: Logger): void => {
+const detectBrokenConnections = (server: WebSocketServer): void => {
   server.on('connection', (client: WebSocketClient) => {
     client.isAlive = true
     client.on('pong', function (this: WebSocketClient) {
@@ -39,26 +76,35 @@ const detectBrokenConnections = (server: WebSocketServer, logger: Logger): void 
   })
 }
 
-const log = (server: WebSocketServer, logger: Logger): void => {
+const log = (server: WebSocketServer): void => {
   server.on('listening', () => {
     logger.debug(`Websocket server listening on port ${server.options.port}`)
   })
-  server.on('connection', () => {
-    logger.debug('Websocket connection started')
-  })
   server.on('error', (e) => {
-    logger.error(`Websocket error: ${e.message}`)
+    logger.error(`Websocket server error: ${e.message}`)
+  })
+
+  server.on('connection', (client) => {
+    logger.debug('Websocket connection started')
+    client.on('close', () => {
+      logger.debug('Websocket connection closed')
+    })
   })
 }
 
-const createServer = ({ logger }: Options): WebSocketServer => {
-  // TODO is this port ok?
-  // See: https://dev.to/richardeschloss/nodejs-portfinding-three-approaches-compared-f1g
-  const port = 4246
-  const server = new WebSocketServer({ port })
+const createServer = async (): Promise<WebSocketServer> => {
+  const server = await findOpenPort({
+    attemptPort: async (port) => {
+      logger.trace(`Attempting to start websocket server on port ${port}`)
+      const server = new WebSocketServer({ port })
+      await waitForServerStart(server)
+      return server
+    },
+    isUnavailablePortError: e => isErrnoException(e) && e.code === 'EADDRINUSE',
+  })
 
-  detectBrokenConnections(server, logger)
-  log(server, logger)
+  detectBrokenConnections(server)
+  log(server)
 
   return server
 }

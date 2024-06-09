@@ -1,10 +1,10 @@
-import streamDeck, { SingletonAction, action } from '@elgato/streamdeck'
+import { SingletonAction, action } from '@elgato/streamdeck'
 import createServer from '../utils/websocket-server'
+import logger from '../utils/logger'
 
 interface DealCardSettings {}
 
-const logger = streamDeck.logger.createScope('DealCard')
-const server = createServer({ logger })
+const server = await createServer()
 
 // TODO share this across packages
 const message = 'deal-card-next'

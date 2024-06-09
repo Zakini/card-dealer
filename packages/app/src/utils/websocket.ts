@@ -10,13 +10,55 @@ const isWebSocket = (v: unknown): v is WebSocket => typeof v === 'object'
   && 'url' in v
   && 'close' in v
 
-const log = (socket: WebSocket) => {
-  socket.addEventListener('open', (e) => {
-    // The type def doesn't mark this as a websocket for some reason
-    const target = isWebSocket(e.target) ? e.target : null
-    if (!target) console.error('Huh? e.target is not a WebSocket??')
-    console.info(`Connected to websocket server at ${target?.url ?? 'UNKNOWN'}`)
+const waitForSocketConnection = async (socket: WebSocket) =>
+  new Promise<void>((resolve, reject) => {
+    const onSuccess: WsEventListener<'open'> = (e) => {
+      socket.removeEventListener('open', onSuccess)
+      socket.removeEventListener('error', onError)
+
+      // The type def doesn't mark this as a websocket for some reason
+      const target = isWebSocket(e.target) ? e.target : null
+      if (!target) console.error('Huh? e.target is not a WebSocket??')
+      console.info(`Connected to websocket server at ${target?.url ?? 'UNKNOWN'}`)
+
+      resolve()
+    }
+    const onError: WsEventListener<'error'> = (e) => {
+      socket.removeEventListener('open', onSuccess)
+      socket.removeEventListener('error', onError)
+
+      // The type def doesn't mark this as a websocket for some reason
+      const target = isWebSocket(e.target) ? e.target : null
+      if (!target) console.error('Huh? e.target is not a WebSocket??')
+      reject(new Error(`Failed websocket connection to ${target?.url ?? 'UNKNOWN'}`))
+    }
+
+    socket.addEventListener('open', onSuccess)
+    socket.addEventListener('error', onError)
   })
+
+// TODO share this across packages
+interface FindOpenPortOptions<T> {
+  attemptPort: (port: number) => T | Promise<T> | never
+  isUnavailablePortError: (e: unknown) => boolean
+}
+const portRangeStart = 6660
+const portRangeLength = 10
+const findOpenPort = async <T>({ attemptPort, isUnavailablePortError }: FindOpenPortOptions<T>) => {
+  for (let port = portRangeStart; port < portRangeStart + portRangeLength; port++) {
+    try {
+      return await attemptPort(port)
+    } catch (e) {
+      if (isUnavailablePortError(e)) continue
+      throw e
+    }
+  }
+
+  const portRangeString = `${portRangeStart} and ${portRangeStart + portRangeLength - 1}`
+  throw new Error(`Failed to find open port between ${portRangeString}`)
+}
+
+const log = (socket: WebSocket) => {
   socket.addEventListener('message', (message) => {
     console.info(`Received websocket message: ${message.data}`)
   })
@@ -42,10 +84,16 @@ const detectBrokenConnections = (socket: WebSocket) => {
   })
 }
 
-const connectToWebsocket = (): WebSocket => {
-  const port = 4246
-  const url = `ws://localhost:${port}`
-  const socket = new WebSocket(url)
+const connectToWebsocket = async (): Promise<WebSocket> => {
+  const socket = await findOpenPort({
+    attemptPort: async (port) => {
+      const url = `ws://localhost:${port}`
+      const socket = new WebSocket(url)
+      await waitForSocketConnection(socket)
+      return socket
+    },
+    isUnavailablePortError: () => true,
+  })
 
   log(socket)
   detectBrokenConnections(socket)

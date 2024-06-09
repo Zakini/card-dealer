@@ -4,15 +4,32 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { config as tailwind } from './utils/tailwind'
 import connectToWebsocket, { WsEventListener } from './utils/websocket'
 
-const socket = connectToWebsocket()
-
 function App() {
+  const [socket, setSocket] = useState<WebSocket | null>(null)
   const [cardDealt, setCardDealt] = useState(false)
   const [cardRevealed, setCardRevealed] = useState(false)
   const [allowRedeal, setAllowRedeal] = useState(false)
 
   // Handle stream deck input
   useEffect(() => {
+    const effect = async () => {
+      try {
+        setSocket(await connectToWebsocket())
+      } catch (e) {
+        // TODO report this to the user
+        console.error(e)
+      }
+    }
+
+    void effect()
+
+    return () => {
+      setSocket(null)
+    }
+  }, [])
+  useEffect(() => {
+    if (!socket) return
+
     const dealListener: WsEventListener<'message'> = (message) => {
       if (message.data !== 'deal-card-next') {
         console.warn(`Unexpected websocket message: ${message.data}`)
@@ -26,7 +43,7 @@ function App() {
     return () => {
       socket.removeEventListener('message', dealListener)
     }
-  }, [])
+  }, [socket])
 
   useEffect(() => {
     if (!cardRevealed) return
