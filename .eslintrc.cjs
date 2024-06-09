@@ -36,6 +36,8 @@ module.exports = {
     'no-console': ['warn', { allow: ['info', 'warn', 'error'] }],
     // Why would you not allow numbers??
     '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+    // Who cares
+    '@typescript-eslint/no-empty-interface': 'off',
   },
   overrides: [
     {

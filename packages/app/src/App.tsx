@@ -6,8 +6,15 @@ import { config as tailwind } from './utils/tailwind'
 type WsEventListener<K extends keyof WebSocketEventMap> =
   (this: WebSocket, ev: WebSocketEventMap[K]) => unknown
 
-const port = 4245
-const socket = new WebSocket(`ws://localhost:${port}`)
+const port = 4246
+const url = `ws://localhost:${port}`
+const socket = new WebSocket(url)
+socket.addEventListener('open', () => {
+  console.info(`Connected to web socket server at ${url}`)
+})
+socket.addEventListener('message', (message) => {
+  console.info(`Received websocket message: ${message.data}`)
+})
 // TODO check for broken connections
 // See: https://www.npmjs.com/package/ws#how-to-detect-and-close-broken-connections
 
@@ -19,7 +26,11 @@ function App() {
   // Handle stream deck input
   useEffect(() => {
     const dealListener: WsEventListener<'message'> = (message) => {
-      if (message.data !== 'deal') return
+      if (message.data !== 'deal-card-next') {
+        console.warn(`Unexpected websocket message: ${message.data}`)
+        return
+      }
+
       setCardDealt(true)
     }
     socket.addEventListener('message', dealListener)

@@ -4,10 +4,10 @@
   "Author": "Zakini",
   "Actions": [
     {
-      "Name": "Counter",
-      "UUID": "com.zakini.card-dealer.increment",
+      "Name": "Deal Card",
+      "UUID": "com.zakini.card-dealer.deal",
       "Icon": "imgs/actions/counter/icon",
-      "Tooltip": "Displays a count, which increments by one on press.",
+      "Tooltip": "Deals a card.",
       "Controllers": [
         "Keypad"
       ],

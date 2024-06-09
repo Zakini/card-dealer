@@ -1,13 +1,7 @@
 import streamDeck, { LogLevel } from '@elgato/streamdeck'
+import { DealCard } from './actions/deal-card'
 
-import { IncrementCounter } from './actions/increment-counter'
-
-// We can enable "trace" logging so that all messages between the Stream Deck, and the plugin are
-// recorded. When storing sensitive information
+// TODO set this lower? based on NODE_ENV?
 streamDeck.logger.setLevel(LogLevel.TRACE)
-
-// Register the increment action.
-streamDeck.actions.registerAction(new IncrementCounter())
-
-// Finally, connect to the Stream Deck.
+streamDeck.actions.registerAction(new DealCard())
 void streamDeck.connect()
