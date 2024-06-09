@@ -1,3 +1,5 @@
+import { pingDelay } from '@card-dealer/utils'
+
 interface WebSocketClient extends WebSocket {
   pingTimeout?: number
 }
@@ -80,7 +82,7 @@ const detectBrokenConnections = (socket: WebSocket) => {
       // See: https://www.npmjs.com/package/ws#how-to-detect-and-close-broken-connections
       // TODO reconnect somehow?
       this.close()
-    }, 30_000 + 1000)
+    }, pingDelay + 1000)
   })
 }
 

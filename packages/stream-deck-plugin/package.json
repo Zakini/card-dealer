@@ -1,5 +1,5 @@
 {
-  "name": "card-dealer-stream-deck-plugin",
+  "name": "@card-dealer/stream-deck-plugin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .ts,.tsx,.config.js,.cjs,.mjs --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@card-dealer/utils": "0.0.0",
     "@elgato/streamdeck": "^0.3.0",
     "ws": "^8.17.0"
   },
