@@ -2,21 +2,9 @@ import { useEffect, useState } from 'react'
 import Card from './components/Card'
 import { motion, AnimatePresence } from 'framer-motion'
 import { config as tailwind } from './utils/tailwind'
+import connectToWebsocket, { WsEventListener } from './utils/websocket'
 
-type WsEventListener<K extends keyof WebSocketEventMap> =
-  (this: WebSocket, ev: WebSocketEventMap[K]) => unknown
-
-const port = 4246
-const url = `ws://localhost:${port}`
-const socket = new WebSocket(url)
-socket.addEventListener('open', () => {
-  console.info(`Connected to web socket server at ${url}`)
-})
-socket.addEventListener('message', (message) => {
-  console.info(`Received websocket message: ${message.data}`)
-})
-// TODO check for broken connections
-// See: https://www.npmjs.com/package/ws#how-to-detect-and-close-broken-connections
+const socket = connectToWebsocket()
 
 function App() {
   const [cardDealt, setCardDealt] = useState(false)
