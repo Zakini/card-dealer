@@ -2,8 +2,9 @@
   "name": "card-dealer",
   "workspaces": ["packages/*"],
   "scripts": {
-    "build": "npm run build:app",
+    "build": "npm run build:app && npm run build:plugin",
     "build:app": "cd packages/app && npm run build",
+    "build:plugin": "cd packages/stream-deck-plugin && npm run build",
     "lint": "npm run lint:root; npm run lint:app",
     "lint:root": "eslint . --ext .ts,.tsx,.config.js,.cjs --report-unused-disable-directives --max-warnings 0",
     "lint:app": "cd packages/app && npm run lint"
