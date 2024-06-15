@@ -12,6 +12,12 @@ const isWebSocket = (v: unknown): v is WebSocket => typeof v === 'object'
   && 'url' in v
   && 'close' in v
 
+class FailedConnectionError extends Error {
+  constructor(targetUrl: string) {
+    super(`Failed websocket connection to ${targetUrl}`)
+  }
+}
+
 const waitForSocketConnection = async (socket: WebSocket) =>
   new Promise<void>((resolve, reject) => {
     const onSuccess: WsEventListener<'open'> = (e) => {
@@ -32,7 +38,7 @@ const waitForSocketConnection = async (socket: WebSocket) =>
       // The type def doesn't mark this as a websocket for some reason
       const target = isWebSocket(e.target) ? e.target : null
       if (!target) console.error('Huh? e.target is not a WebSocket??')
-      reject(new Error(`Failed websocket connection to ${target?.url ?? 'UNKNOWN'}`))
+      reject(new FailedConnectionError(target?.url ?? 'UNKNOWN'))
     }
 
     socket.addEventListener('open', onSuccess)
@@ -66,6 +72,7 @@ const detectBrokenConnections = (socket: WebSocket) => {
 }
 
 const connectToWebsocket = async (): Promise<WebSocket> => {
+  // TODO retry this until it works
   const socket = await findOpenPort({
     attemptPort: async (port) => {
       const url = `ws://localhost:${port}`
@@ -73,7 +80,7 @@ const connectToWebsocket = async (): Promise<WebSocket> => {
       await waitForSocketConnection(socket)
       return socket
     },
-    isUnavailablePortError: () => true,
+    isUnavailablePortError: e => e instanceof FailedConnectionError,
   })
 
   log(socket)
