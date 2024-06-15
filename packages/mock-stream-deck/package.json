@@ -6,9 +6,7 @@
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "start": "node .",
-    "dev": "tsx src/index.ts",
-    "build": "tsc",
+    "start": "tsx src/index.ts",
     "lint": "eslint . --ext .ts,.tsx,.config.js,.cjs,.mjs --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {

@@ -2,7 +2,7 @@
   "name": "card-dealer",
   "workspaces": ["packages/*"],
   "scripts": {
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspace @card-dealer/utils && npm run build --workspace @card-dealer/app --workspace @card-dealer/stream-deck-plugin",
     "lint": "eslint . --ext .ts,.tsx,.config.js,.cjs,.mjs --report-unused-disable-directives --max-warnings 0"
   }
 }
