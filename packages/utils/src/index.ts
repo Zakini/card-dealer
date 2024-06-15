@@ -1,3 +1,5 @@
+import { WebSocket, WebSocketServer } from 'ws'
+
 export const pingDelay = 30_000
 
 export const cardMessage = 'deal-card-next'
@@ -21,4 +23,96 @@ export const findOpenPort = async <T>({ attemptPort, isUnavailablePortError }: F
 
   const portRangeString = `${portRangeStart} and ${portRangeStart + portRangeLength - 1}`
   throw new Error(`Failed to find open port between ${portRangeString}`)
+}
+
+interface WebSocketClient extends WebSocket {
+  isAlive?: boolean
+}
+
+interface Logger {
+  trace(message: string): void
+  debug(message: string): void
+  error(message: string): void
+}
+
+const isErrnoException = (v: unknown): v is NodeJS.ErrnoException => typeof v === 'object'
+  && v !== null
+  && 'code' in v
+  && typeof v.code === 'string'
+
+const waitForServerStart = async (server: WebSocketServer, logger: Logger) =>
+  new Promise<void>((resolve, reject) => {
+    const onSuccess = () => {
+      server.off('error', onError)
+      logger.debug(`Websocket server listening on port ${server.options.port}`)
+      resolve()
+    }
+    const onError = (e: Error) => {
+      server.off('connection', onSuccess)
+      reject(e)
+    }
+
+    server.once('listening', onSuccess)
+    server.once('error', onError)
+  })
+
+const detectBrokenConnections = (server: WebSocketServer, logger: Logger): void => {
+  server.on('connection', (client: WebSocketClient) => {
+    client.isAlive = true
+    client.on('pong', function (this: WebSocketClient) {
+      this.isAlive = true
+    })
+  })
+
+  const intervalId = setInterval(() => {
+    const clients: Set<WebSocketClient> = server.clients
+    for (const client of clients) {
+      if (client.isAlive === false) {
+        logger.debug('Terminating unresponsive client connection')
+        client.terminate()
+        return
+      }
+
+      client.isAlive = false
+      client.ping()
+    }
+  }, pingDelay)
+
+  server.on('close', () => {
+    clearInterval(intervalId)
+  })
+}
+
+const log = (server: WebSocketServer, logger: Logger): void => {
+  server.on('listening', () => {
+    logger.debug(`Websocket server listening on port ${server.options.port}`)
+  })
+  server.on('error', (e) => {
+    logger.error(`Websocket server error: ${e.message}`)
+  })
+
+  server.on('connection', (client) => {
+    logger.debug('Websocket connection started')
+    client.on('close', () => {
+      logger.debug('Websocket connection closed')
+    })
+  })
+}
+
+export const createWebsocketServer = async (logger: Logger): Promise<WebSocketServer> => {
+  // TODO retry this until server starts
+  const server = await findOpenPort({
+    attemptPort: async (port) => {
+      logger.trace(`Attempting to start websocket server on port ${port}`)
+      const server = new WebSocketServer({ port })
+      await waitForServerStart(server, logger)
+      return server
+    },
+    isUnavailablePortError: e => isErrnoException(e) && e.code === 'EADDRINUSE',
+  })
+
+  detectBrokenConnections(server, logger)
+  log(server, logger)
+
+  return server
 }

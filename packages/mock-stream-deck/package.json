@@ -1,16 +1,21 @@
 {
-  "name": "@card-dealer/utils",
+  "name": "@card-dealer/mock-stream-deck",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
+    "start": "node .",
+    "dev": "tsx src/index.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts,.tsx,.config.js,.cjs,.mjs --report-unused-disable-directives --max-warnings 0"
   },
+  "dependencies": {
+    "@card-dealer/utils": "^0.0.0"
+  },
   "devDependencies": {
+    "tsx": "^4.15.5",
     "typescript": "^5.2.2"
   }
 }

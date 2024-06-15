@@ -1,11 +1,10 @@
 import { SingletonAction, action } from '@elgato/streamdeck'
-import createServer from '../utils/websocket-server'
 import logger from '../utils/logger'
-import { cardMessage } from '@card-dealer/utils'
+import { cardMessage, createWebsocketServer } from '@card-dealer/utils'
 
 interface DealCardSettings {}
 
-const server = await createServer()
+const server = await createWebsocketServer(logger)
 
 @action({ UUID: 'com.zakini.card-dealer.deal' })
 export class DealCard extends SingletonAction<DealCardSettings> {
