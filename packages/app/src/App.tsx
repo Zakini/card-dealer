@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 import Card from './components/Card'
 import { motion, AnimatePresence } from 'framer-motion'
-import { config as tailwind } from './utils/tailwind'
 import connectToWebsocket, { WsEventListener } from './utils/websocket'
 import { cardMessage } from '@card-dealer/utils'
 
 function App() {
   const [socket, setSocket] = useState<WebSocket | null>(null)
+  const [dealCard, setDealCard] = useState(false)
   const [cardDealt, setCardDealt] = useState(false)
-  const [cardRevealed, setCardRevealed] = useState(false)
-  const [allowRedeal, setAllowRedeal] = useState(false)
+  const [flipCard, setFlipCard] = useState(false)
+  const [cardFaceUp, setCardFaceUp] = useState(false)
 
   // Handle stream deck input
   useEffect(() => {
@@ -53,54 +53,49 @@ function App() {
         return
       }
 
-      setCardDealt(true)
+      if (!dealCard) setDealCard(true)
+      else if (cardDealt && !flipCard) setFlipCard(true)
+      else if (cardFaceUp) setDealCard(false)
     }
     socket.addEventListener('message', dealListener)
 
     return () => {
       socket.removeEventListener('message', dealListener)
     }
-  }, [socket])
-
-  useEffect(() => {
-    if (!cardRevealed) return
-
-    // eslint-disable-next-line @stylistic/max-statements-per-line
-    const timeoutId = setTimeout(() => { setAllowRedeal(true) }, 1000)
-
-    // eslint-disable-next-line @stylistic/max-statements-per-line
-    return () => { clearTimeout(timeoutId) }
-  }, [cardRevealed])
+  }, [socket, dealCard, cardDealt, flipCard, cardFaceUp])
 
   // Reset state on redeal
   useEffect(() => {
-    if (cardDealt) return
+    if (dealCard) return
 
-    setCardRevealed(false)
-    setAllowRedeal(false)
-  }, [cardDealt])
+    setDealCard(false)
+    setCardDealt(false)
+    setFlipCard(false)
+    setCardFaceUp(false)
+  }, [dealCard])
 
   return (
     // z-0 starts a new stacking context here (I think?)
     <div className="relative z-0 overflow-hidden bg-black">
-      <div
-        className="h-screen overflow-hidden z-10 flex items-center justify-center"
-        onClick={() => { setCardDealt(true) }}
-      >
+      <div className="h-screen overflow-hidden z-10 flex items-center justify-center">
         <Card
-          deal={cardDealt}
+          deal={dealCard}
+          flip={flipCard}
           className="h-1/2"
           // NOTE we use 100vh since the container fills the screen, and 50% since that's the
           // height of the card. Update this if either of those changes!
           initialY="calc(100vh - 50%)"
-          onFlip={({ faceUp }) => {
-            if (faceUp) setCardRevealed(true)
+          onDealEnd={() => {
+            setCardDealt(true)
+          }}
+          onFlipEnd={() => {
+            setCardFaceUp(true)
           }}
         />
       </div>
 
       <AnimatePresence>
-        {!cardDealt && (
+        {!dealCard && (
           <motion.div
             className="absolute inset-0 -z-10 flex items-center justify-center"
             initial={{ opacity: 0 }}
@@ -108,31 +103,9 @@ function App() {
             exit={{ opacity: 0, transition: { duration: 1 } }}
           >
             <span className="text-gray-900 text-9xl uppercase font-bold select-none">
-              Click to Deal
+              Deal?
             </span>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {allowRedeal && (
-          <motion.button
-            onClick={() => { setCardDealt(false) }}
-            className="absolute right-0 bottom-0 p-10 text-xl lowercase"
-            initial={{
-              opacity: 0,
-              y: tailwind.theme.translate[5],
-              color: tailwind.theme.colors.gray[700],
-            }}
-            animate={{ opacity: 1 }}
-            whileHover={{
-              y: tailwind.theme.translate[0],
-              color: tailwind.theme.colors.gray[500],
-            }}
-            transition={{ duration: 2 }}
-          >
-            Again?
-          </motion.button>
         )}
       </AnimatePresence>
     </div>

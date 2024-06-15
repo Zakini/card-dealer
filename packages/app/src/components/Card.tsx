@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react'
 
 interface Props {
   deal: boolean
+  flip: boolean
   className?: string
   initialY: string | number | CustomValueType
 
-  onFlip: (info: { faceUp: boolean }) => void
+  onDealEnd: () => void
+  onFlipEnd: () => void
 }
 
 const deck = Object.values(import.meta.glob<string>(
@@ -17,41 +19,25 @@ const deck = Object.values(import.meta.glob<string>(
 
 const drawCard = () => deck[Math.floor(Math.random() * deck.length)]
 
-const usePrevious = <T,>(value: T, initial: T | null = null) => {
-  const [current, setCurrent] = useState<T>(value)
-  const [previous, setPrevious] = useState<T | null>(initial)
-
-  if (value !== current) {
-    setPrevious(current)
-    setCurrent(value)
-  }
-
-  return previous
-}
-
-export default function Card({ deal, className: inputClassName = '', initialY, onFlip }: Props) {
+export default function Card({
+  deal,
+  flip: flipping,
+  className: inputClassName = '',
+  initialY,
+  onDealEnd,
+  onFlipEnd,
+}: Props) {
   const className = `${inputClassName} aspect-auto`
 
   const [card, setCard] = useState(drawCard())
-  const [flipping, setFlipping] = useState(false)
   const [faceUp, setFaceUp] = useState(false)
-  const wasFaceUp = usePrevious(faceUp, false)
-  const [cardDealt, setCardDealt] = useState(false)
-
-  useEffect(() => {
-    if (faceUp === (wasFaceUp)) return
-
-    onFlip({ faceUp })
-  }, [faceUp, wasFaceUp, onFlip])
 
   // Reset state on discard
   useEffect(() => {
     if (deal) return
 
     setCard(drawCard())
-    setFlipping(false)
     setFaceUp(false)
-    setCardDealt(false)
   }, [deal])
 
   return (
@@ -66,24 +52,25 @@ export default function Card({ deal, className: inputClassName = '', initialY, o
           animate="deal"
           exit="flip"
           onAnimationComplete={(def) => {
-            if (def === 'deal') setCardDealt(true)
+            if (def === 'deal') onDealEnd()
             else if (def === 'flip') setFaceUp(true)
           }}
         >
-          <img
-            className={className}
-            src={cardBack}
-            onClick={() => {
-              if (cardDealt) setFlipping(true)
-            }}
-          />
+          <img className={className} src={cardBack} />
         </motion.div>
       )}
       {deal && faceUp && (
         <motion.div
           initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1, transition: { ease: 'easeIn' } }}
-          exit={{ y: initialY, transition: { duration: 0.75, ease: 'easeOut' } }}
+          variants={{
+            flip: { scaleX: 1, transition: { ease: 'easeIn' } },
+            leave: { y: initialY, transition: { duration: 0.75, ease: 'easeOut' } },
+          }}
+          animate="flip"
+          exit="leave"
+          onAnimationComplete={(def) => {
+            if (def === 'flip') onFlipEnd()
+          }}
         >
           <img className={className} src={card} />
         </motion.div>

@@ -76,6 +76,7 @@ const connectToWebsocket = async (): Promise<WebSocket> => {
   const socket = await findOpenPort({
     attemptPort: async (port) => {
       const url = `ws://localhost:${port}`
+      console.info(`Attempting connection to ${url}`)
       const socket = new WebSocket(url)
       await waitForSocketConnection(socket)
       return socket
