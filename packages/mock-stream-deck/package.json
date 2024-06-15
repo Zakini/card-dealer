@@ -1,7 +1,7 @@
 {
   "name": "@card-dealer/mock-stream-deck",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .ts,.tsx,.config.js,.cjs,.mjs --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@card-dealer/utils": "^0.0.0"
+    "@card-dealer/utils": "1.0.0"
   },
   "devDependencies": {
     "tsx": "^4.15.5",

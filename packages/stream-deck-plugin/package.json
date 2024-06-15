@@ -1,7 +1,7 @@
 {
   "name": "@card-dealer/stream-deck-plugin",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "link": "streamdeck link com.zakini.card-dealer.sdPlugin",
@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .ts,.tsx,.config.js,.cjs,.mjs --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@card-dealer/utils": "0.0.0",
+    "@card-dealer/utils": "1.0.0",
     "@elgato/streamdeck": "^0.3.0",
     "ws": "^8.17.0"
   },
