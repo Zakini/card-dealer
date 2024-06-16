@@ -19,14 +19,14 @@ const deck = Object.values(import.meta.glob<string>(
 
 const drawCard = () => deck[Math.floor(Math.random() * deck.length)]
 
-export default function Card({
+const Card = ({
   deal,
   flip: flipping,
   className: inputClassName = '',
   initialY,
   onDealEnd,
   onFlipEnd,
-}: Props) {
+}: Props) => {
   const className = `${inputClassName} aspect-auto`
 
   const [card, setCard] = useState(drawCard())
@@ -78,3 +78,5 @@ export default function Card({
     </AnimatePresence>
   )
 }
+
+export default Card

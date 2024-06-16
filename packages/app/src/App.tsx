@@ -58,7 +58,7 @@ const useStreamDeckInput = (onMessage: () => void) => {
   }, [socket, onMessage])
 }
 
-function App() {
+const App = () => {
   const [dealCard, setDealCard] = useState(false)
   const [cardDealt, setCardDealt] = useState(false)
   const [flipCard, setFlipCard] = useState(false)

@@ -19,7 +19,7 @@ module.exports = {
     project: ['./packages/*/tsconfig.json', './tsconfig.node.json'],
     tsconfigRootDir: __dirname,
   },
-  plugins: ['react-refresh'],
+  plugins: ['react-refresh', 'prefer-arrow-functions'],
   settings: {
     react: { version: 'detect' },
   },
@@ -38,6 +38,8 @@ module.exports = {
     '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
     // Who cares
     '@typescript-eslint/no-empty-interface': 'off',
+    // Arrow functions are just nicer
+    'prefer-arrow-functions/prefer-arrow-functions': 'error',
   },
   overrides: [
     {
