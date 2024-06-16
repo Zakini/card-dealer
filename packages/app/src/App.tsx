@@ -1,16 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Card from './components/Card'
 import connectToWebsocket, { WsEventListener } from './utils/websocket'
 import { cardMessage } from '@card-dealer/utils'
 
-function App() {
+const useStreamDeckInput = (onMessage: () => void) => {
   const [socket, setSocket] = useState<WebSocket | null>(null)
-  const [dealCard, setDealCard] = useState(false)
-  const [cardDealt, setCardDealt] = useState(false)
-  const [flipCard, setFlipCard] = useState(false)
-  const [cardFaceUp, setCardFaceUp] = useState(false)
 
-  // Handle stream deck input
   useEffect(() => {
     const promise = connectToWebsocket()
 
@@ -43,6 +38,7 @@ function App() {
       void cleanup()
     }
   }, [])
+
   useEffect(() => {
     if (!socket) return
 
@@ -52,16 +48,29 @@ function App() {
         return
       }
 
-      if (!dealCard) setDealCard(true)
-      else if (cardDealt && !flipCard) setFlipCard(true)
-      else if (cardFaceUp) setDealCard(false)
+      onMessage()
     }
     socket.addEventListener('message', dealListener)
 
     return () => {
       socket.removeEventListener('message', dealListener)
     }
-  }, [socket, dealCard, cardDealt, flipCard, cardFaceUp])
+  }, [socket, onMessage])
+}
+
+function App() {
+  const [dealCard, setDealCard] = useState(false)
+  const [cardDealt, setCardDealt] = useState(false)
+  const [flipCard, setFlipCard] = useState(false)
+  const [cardFaceUp, setCardFaceUp] = useState(false)
+
+  useStreamDeckInput(
+    useCallback(() => {
+      if (!dealCard) setDealCard(true)
+      else if (cardDealt && !flipCard) setFlipCard(true)
+      else if (cardFaceUp) setDealCard(false)
+    }, [dealCard, cardDealt, flipCard, cardFaceUp]),
+  )
 
   // Reset state on redeal
   useEffect(() => {
