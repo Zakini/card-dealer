@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import Card from './components/Card'
-import { motion, AnimatePresence } from 'framer-motion'
 import connectToWebsocket, { WsEventListener } from './utils/websocket'
 import { cardMessage } from '@card-dealer/utils'
 
@@ -76,7 +75,7 @@ function App() {
 
   return (
     // z-0 starts a new stacking context here (I think?)
-    <div className="relative z-0 overflow-hidden bg-black">
+    <div className="relative z-0 overflow-hidden">
       <div className="h-screen overflow-hidden z-10 flex items-center justify-center">
         <Card
           deal={dealCard}
@@ -93,21 +92,6 @@ function App() {
           }}
         />
       </div>
-
-      <AnimatePresence>
-        {!dealCard && (
-          <motion.div
-            className="absolute inset-0 -z-10 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 1 } }}
-            exit={{ opacity: 0, transition: { duration: 1 } }}
-          >
-            <span className="text-gray-900 text-9xl uppercase font-bold select-none">
-              Deal?
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
