@@ -9,6 +9,7 @@ This is a pair of tools for dealing cards in an OBS browser source, using a Elga
 1. Open the Stream Deck app
 1. Double click com.zakini.card-dealer.streamDeckPlugin to install it
 1. Add the "deal card" action to your stream deck
+1. Select the card back and card faces in the action's settings
 1. Set up a browser source in OBS using card-dealer.html
 
 ## Set up
