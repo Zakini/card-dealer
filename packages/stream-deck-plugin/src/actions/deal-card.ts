@@ -46,8 +46,6 @@ export class DealCard extends SingletonAction<DealCardSettings> {
   }
 
   async onDidReceiveSettings(ev: DidReceiveSettingsEvent<DealCardSettings>): Promise<void> {
-    logger.debug(JSON.stringify(ev.action.id))
-    logger.debug(JSON.stringify(streamDeck.info))
     logger.trace(`Settings changed: ${JSON.stringify(ev.payload.settings)}`)
 
     const data: DealCardSettings = {
