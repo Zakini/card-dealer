@@ -3,6 +3,7 @@ import { WebSocket, WebSocketServer } from 'ws'
 export const pingDelay = 30_000
 
 export const cardMessage = 'deal-card-next'
+export const settingsMessage = 'deal-card-settings'
 
 interface FindOpenPortOptions<T> {
   attemptPort: (port: number) => T | Promise<T> | never
@@ -115,4 +116,49 @@ export const createWebsocketServer = async (logger: Logger): Promise<WebSocketSe
   log(server, logger)
 
   return server
+}
+
+export interface DealCardSettings {
+  cardBack?: string | null
+  cardFaces?: string[]
+}
+
+export type Message = { message: typeof cardMessage }
+  | { message: typeof settingsMessage, data: DealCardSettings }
+
+const isDealCardSettings = (v: unknown): v is DealCardSettings => typeof v === 'object'
+  && v !== null
+  && (!('cardBack' in v) || v.cardBack === null || typeof v.cardBack === 'string')
+  && (
+    !('cardFaces' in v)
+      || (Array.isArray(v.cardFaces) && v.cardFaces.every(w => typeof w === 'string'))
+  )
+
+const isMessage = (v: unknown): v is Message => {
+  const objectWithMessage = typeof v === 'object'
+    && v !== null
+    && 'message' in v
+    && (v.message === cardMessage || v.message === settingsMessage)
+
+  if (!objectWithMessage) return false
+
+  if (v.message === cardMessage) return true
+
+  return v.message === settingsMessage
+    && 'data' in v
+    && isDealCardSettings(v.data)
+}
+
+export const sendMessage = (socket: WebSocket, message: Message) => {
+  socket.send(JSON.stringify(message))
+}
+
+export const receiveMessage = (message: MessageEvent<unknown>): Message => {
+  const raw = message.data
+  if (typeof raw !== 'string') throw new Error(`Invalid message data: ${JSON.stringify(raw)}`)
+
+  const json = JSON.parse(raw)
+  if (!isMessage(json)) throw new Error(`Invalid message data: ${raw}`)
+
+  return json
 }

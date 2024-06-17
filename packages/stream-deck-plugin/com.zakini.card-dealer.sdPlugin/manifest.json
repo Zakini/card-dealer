@@ -19,6 +19,7 @@
       ]
     }
   ],
+  "PropertyInspectorPath": "property-inspector.html",
   "Category": "Card Dealer",
   "CategoryIcon": "imgs/plugin/category-icon",
   "CodePath": "bin/plugin.js",

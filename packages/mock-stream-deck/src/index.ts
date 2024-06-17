@@ -1,5 +1,5 @@
 import { emitKeypressEvents } from 'readline'
-import { cardMessage, createWebsocketServer } from '@card-dealer/utils'
+import { cardMessage, createWebsocketServer, sendMessage } from '@card-dealer/utils'
 
 emitKeypressEvents(process.stdin)
 if (process.stdin.isTTY) process.stdin.setRawMode(true)
@@ -28,6 +28,6 @@ process.stdin.on('keypress', (char, { ctrl, name }) => {
   for (const client of server.clients) {
     // TODO client IDs
     console.info(`Sending ${cardMessage} to client`)
-    client.send(cardMessage)
+    sendMessage(client, { message: cardMessage })
   }
 })

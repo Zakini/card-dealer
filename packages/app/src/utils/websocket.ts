@@ -47,7 +47,7 @@ const waitForSocketConnection = async (socket: WebSocket) =>
 
 const log = (socket: WebSocket) => {
   socket.addEventListener('message', (message) => {
-    console.info(`Received websocket message: ${message.data}`)
+    console.info('Received websocket message:', message.data)
   })
   socket.addEventListener('close', (e) => {
     // The type def doesn't mark this as a websocket for some reason

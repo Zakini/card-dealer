@@ -1,0 +1,17 @@
+.sdpi-item-group.file {
+  flex-direction: column;
+  gap: 2px;
+  align-items: initial;
+}
+
+label.sdpi-file-label {
+  margin-left: 5px;
+  margin-right: auto;
+}
+
+.sdpi-file-info {
+  max-width: 100%;
+  width: 100%;
+  max-height: none;
+  white-space: pre-wrap;
+}

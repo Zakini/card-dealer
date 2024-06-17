@@ -11,7 +11,10 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:@stylistic/recommended-extends',
   ],
-  ignorePatterns: ['dist'],
+  ignorePatterns: [
+    '**/dist',
+    'packages/stream-deck-plugin/com.zakini.card-dealer.sdPlugin/libs',
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
@@ -36,8 +39,6 @@ module.exports = {
     'no-console': ['warn', { allow: ['info', 'warn', 'error'] }],
     // Why would you not allow numbers??
     '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
-    // Who cares
-    '@typescript-eslint/no-empty-interface': 'off',
     // Arrow functions are just nicer
     'prefer-arrow-functions/prefer-arrow-functions': 'error',
   },
@@ -53,6 +54,20 @@ module.exports = {
         'packages/*/*.config.mjs',
       ],
       env: { node: true },
+    },
+    {
+      files: ['packages/stream-deck-plugin/com.zakini.card-dealer.sdPlugin/*.js'],
+      env: { browser: true },
+      globals: { $PI: false },
+      rules: {
+        // Have to use this in these files
+        '@typescript-eslint/triple-slash-reference': 'off',
+        // These don't seem to work in js files
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
+      },
     },
   ],
 }

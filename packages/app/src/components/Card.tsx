@@ -1,8 +1,9 @@
 import { motion, AnimatePresence, CustomValueType } from 'framer-motion'
-import cardBack from '../assets/cards/default/back.svg'
 import { useEffect, useState } from 'react'
+import { DealCardSettings } from '@card-dealer/utils'
 
 interface Props {
+  settings: DealCardSettings
   deal: boolean
   flip: boolean
   className?: string
@@ -12,14 +13,11 @@ interface Props {
   onFlipEnd: () => void
 }
 
-const deck = Object.values(import.meta.glob<string>(
-  '../assets/cards/default/faces/*.svg',
-  { eager: true, import: 'default' },
-))
-
-const drawCard = () => deck[Math.floor(Math.random() * deck.length)]
+const drawCard = (deck: string[]): string | null =>
+  deck[Math.floor(Math.random() * deck.length)] ?? null
 
 const Card = ({
+  settings: { cardBack, cardFaces = [] },
   deal,
   flip: flipping,
   className: inputClassName = '',
@@ -29,16 +27,16 @@ const Card = ({
 }: Props) => {
   const className = `${inputClassName} aspect-auto`
 
-  const [card, setCard] = useState(drawCard())
+  const [card, setCard] = useState(drawCard(cardFaces))
   const [faceUp, setFaceUp] = useState(false)
 
   // Reset state on discard
   useEffect(() => {
     if (deal) return
 
-    setCard(drawCard())
+    setCard(drawCard(cardFaces))
     setFaceUp(false)
-  }, [deal])
+  }, [deal, cardFaces])
 
   return (
     <AnimatePresence>
@@ -56,7 +54,7 @@ const Card = ({
             else if (def === 'flip') setFaceUp(true)
           }}
         >
-          <img className={className} src={cardBack} />
+          <img className={className} src={cardBack ?? undefined} />
         </motion.div>
       )}
       {deal && faceUp && (
@@ -72,7 +70,7 @@ const Card = ({
             if (def === 'flip') onFlipEnd()
           }}
         >
-          <img className={className} src={card} />
+          <img className={className} src={card ?? undefined} />
         </motion.div>
       )}
     </AnimatePresence>

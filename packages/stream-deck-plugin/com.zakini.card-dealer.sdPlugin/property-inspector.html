@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="./libs/css/sdpi.css">
+    <link rel="stylesheet" href="./property-inspector.css">
+  </head>
+  <body>
+    <div class="sdpi-wrapper">
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">Card Back</div>
+        <div class="sdpi-item-group file">
+          <input class="sdpi-item-value" id="cardBack" name="cardBack" type="file" accept="image/*">
+          <label class="sdpi-file-label" for="cardBack">Choose file...</label>
+          <label class="sdpi-file-info" for="cardBack">No file selected</label>
+        </div>
+      </div>
+
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">Card Faces</div>
+        <div class="sdpi-item-group file">
+          <input class="sdpi-item-value" id="cardFaces" name="cardFaces" type="file" accept="image/*" multiple>
+          <label class="sdpi-file-label" for="cardFaces">Choose files...</label>
+          <label class="sdpi-file-info" for="cardFaces">No files selected</label>
+        </div>
+      </div>
+    </div>
+
+    <script src="./libs/js/constants.js"></script>
+    <script src="./libs/js/events.js"></script>
+    <script src="./libs/js/api.js"></script>
+    <script src="./libs/js/property-inspector.js"></script>
+    <script src="./property-inspector.js"></script>
+  </body>
+</html>

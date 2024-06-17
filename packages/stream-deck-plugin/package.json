@@ -12,6 +12,7 @@
   "dependencies": {
     "@card-dealer/utils": "1.0.0",
     "@elgato/streamdeck": "^0.3.0",
+    "datauri": "^4.1.0",
     "ws": "^8.17.0"
   },
   "devDependencies": {

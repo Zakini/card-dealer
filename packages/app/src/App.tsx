@@ -1,9 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import Card from './components/Card'
 import connectToWebsocket, { WsEventListener } from './utils/websocket'
-import { cardMessage } from '@card-dealer/utils'
+import { DealCardSettings, cardMessage, receiveMessage } from '@card-dealer/utils'
 
-const useStreamDeckInput = (onMessage: () => void) => {
+interface UseStreamDeckInputOptions {
+  onMessage: () => void
+  onSettings: (newSettings: DealCardSettings) => void
+}
+
+const useStreamDeckInput = ({ onMessage, onSettings }: UseStreamDeckInputOptions) => {
   const [socket, setSocket] = useState<WebSocket | null>(null)
 
   useEffect(() => {
@@ -42,35 +47,39 @@ const useStreamDeckInput = (onMessage: () => void) => {
   useEffect(() => {
     if (!socket) return
 
-    const dealListener: WsEventListener<'message'> = (message) => {
-      if (message.data !== cardMessage) {
-        console.warn(`Unexpected websocket message: ${message.data}`)
-        return
-      }
+    const messageListener: WsEventListener<'message'> = (e: MessageEvent<unknown>) => {
+      const m = receiveMessage(e)
 
-      onMessage()
+      if (m.message === cardMessage) {
+        onMessage()
+      } else {
+        onSettings(m.data)
+      }
     }
-    socket.addEventListener('message', dealListener)
+    socket.addEventListener('message', messageListener)
 
     return () => {
-      socket.removeEventListener('message', dealListener)
+      socket.removeEventListener('message', messageListener)
     }
-  }, [socket, onMessage])
+  }, [socket, onMessage, onSettings])
 }
 
 const App = () => {
+  const [settings, setSettings] = useState<DealCardSettings>({})
+
   const [dealCard, setDealCard] = useState(false)
   const [cardDealt, setCardDealt] = useState(false)
   const [flipCard, setFlipCard] = useState(false)
   const [cardFaceUp, setCardFaceUp] = useState(false)
 
-  useStreamDeckInput(
-    useCallback(() => {
+  useStreamDeckInput({
+    onMessage: useCallback(() => {
       if (!dealCard) setDealCard(true)
       else if (cardDealt && !flipCard) setFlipCard(true)
       else if (cardFaceUp) setDealCard(false)
     }, [dealCard, cardDealt, flipCard, cardFaceUp]),
-  )
+    onSettings: setSettings,
+  })
 
   // Reset state on redeal
   useEffect(() => {
@@ -87,6 +96,7 @@ const App = () => {
     <div className="relative z-0 overflow-hidden">
       <div className="h-screen overflow-hidden z-10 flex items-center justify-center">
         <Card
+          settings={settings}
           deal={dealCard}
           flip={flipCard}
           className="h-1/2"

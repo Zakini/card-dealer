@@ -14,7 +14,8 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "com.zakini.card-dealer.sdPlugin/*.js"
   ],
   "exclude": [
     "node_modules"
