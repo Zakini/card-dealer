@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, CustomValueType } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { DealCardSettings } from '@card-dealer/utils'
+import { shuffle } from 'radash'
 
 interface Props {
   settings: DealCardSettings
@@ -13,11 +14,39 @@ interface Props {
   onFlipEnd: () => void
 }
 
-const drawCard = (deck: string[]): string | null =>
-  deck[Math.floor(Math.random() * deck.length)] ?? null
+const useDeck = (cards: string[]) => {
+  const [deck, setDeck] = useState<string[]>([])
+  const [index, setIndex] = useState<number | null>(null)
+
+  useEffect(() => {
+    setDeck(shuffle(cards))
+    setIndex(cards.length > 0 ? 0 : null)
+  }, [cards])
+
+  const card = index === null ? null : deck[index]
+
+  const drawCard = useCallback(() => {
+    setIndex((i) => {
+      if (i === null) return null
+      return (i + 1) % cards.length
+    })
+  }, [cards])
+
+  // Reshuffle deck when fully drawn
+  useEffect(() => {
+    if (index !== 0) return
+
+    setDeck(shuffle(cards))
+  }, [index, cards])
+
+  return [card, drawCard] as const
+}
+
+// This can't be defined in the component, since it'll change on each render and cause chaos
+const empty: string[] = []
 
 const Card = ({
-  settings: { cardBack, cardFaces = [] },
+  settings: { cardBack, cardFaces },
   deal,
   flip: flipping,
   className: inputClassName = '',
@@ -27,16 +56,16 @@ const Card = ({
 }: Props) => {
   const className = `${inputClassName} aspect-auto`
 
-  const [card, setCard] = useState(drawCard(cardFaces))
+  const [card, drawCard] = useDeck(cardFaces ?? empty)
   const [faceUp, setFaceUp] = useState(false)
 
   // Reset state on discard
   useEffect(() => {
     if (deal) return
 
-    setCard(drawCard(cardFaces))
+    drawCard()
     setFaceUp(false)
-  }, [deal, cardFaces])
+  }, [deal, drawCard])
 
   return (
     <AnimatePresence>
