@@ -28,8 +28,12 @@ export class DealCard extends SingletonAction<DealCardSettings> {
 
     server.on('connection', () => {
       // Calling getSettings() triggers onDidReceiveSettings()
-      void streamDeck.actions.createController(ev.action.id)
-        .getSettings()
+      // HACK React running useEffect()s results in this listener running twice quickly which
+      // something doesn't like. Delay by 1 second to avoid this
+      setTimeout(() => {
+        void streamDeck.actions.createController(ev.action.id)
+          .getSettings()
+      }, 1000)
     })
   }
 
